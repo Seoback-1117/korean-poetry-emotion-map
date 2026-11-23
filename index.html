@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>시어(詩語)의 결: 한국 근대시 감성 분석 아카이브</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg-main: #f7f5f0;
+      --bg-card: #ffffff;
+      --bg-sub: #efece6;
+      --text-primary: #1f2421;
+      --text-secondary: #5a625e;
+      --border-color: #e2ddd5;
+      --accent: #2c4a3e;
+      --accent-light: #e6edea;
+      --serif: 'Noto Serif KR', serif;
+      --sans: 'Noto Sans KR', sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      background-color: var(--bg-main);
+      color: var(--text-primary);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* 상단 헤더 & 네비게이션 (샘플과 차별화된 에디토리얼 상단바) */
+    header {
+      background: var(--accent);
+      color: #f7f5f0;
+      padding: 1.5rem 2rem;
+      border-bottom: 3px solid #1b3028;
+    }
+    .header-inner {
+      max-width: 1360px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand h1 {
+      font-family: var(--serif);
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand p {
+      font-size: 0.88rem;
+      color: #cbd5d0;
+      margin-top: 0.25rem;
+    }
+
+    /* 상단 탭 메뉴 */
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: rgba(255,255,255,0.12);
+      color: #f7f5f0;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: var(--sans);
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.22); }
+    .tab-btn.active {
+      background: #f7f5f0;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* 메인 컨테이너 */
+    .container {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* 시 선택 가로 필름스트립 + 가중치 컨트롤 바 */
+    .control-bar {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .poem-strip-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .poem-strip-header h2 {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+    .weight-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: var(--bg-sub);
+      padding: 0.4rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+    .weight-box input[type="range"] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .poem-list {
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: thin;
+    }
+    .poem-chip {
+      flex: 0 0 auto;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.5rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: left;
+    }
+    .poem-chip:hover { border-color: var(--accent); }
+    .poem-chip.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .poem-chip .p-title {
+      font-family: var(--serif);
+      font-weight: 600;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .poem-chip .p-meta {
+      font-size: 0.78rem;
+      opacity: 0.8;
+    }
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* 탭 뷰 전환 */
+    .view-section { display: none; }
+    .view-section.active { display: block; }
+
+    /* 그리드 레이아웃 */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.15fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .grid-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.6rem;
+    }
+    .card-sub {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+    }
+
+    /* 본문 뷰어 (F-02) */
+    .poem-header { margin-bottom: 1.25rem; }
+    .poem-header h2 {
+      font-family: var(--serif);
+      font-size: 1.75rem;
+      color: var(--text-primary);
+    }
+    .poem-header .meta {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+    .poem-body {
+      font-family: var(--serif);
+      font-size: 1.05rem;
+      line-height: 1.95;
+      background: #fcfbf9;
+      padding: 1.25rem;
+      border-radius: 8px;
+      border: 1px solid #ece8e0;
+      max-height: 520px;
+      overflow-y: auto;
+    }
+    .poem-stanza { margin-bottom: 1.2rem; }
+    .poem-stanza:last-child { margin-bottom: 0; }
+    .poem-line {
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+    .line-num {
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      color: #a0a6a3;
+      min-width: 1.4rem;
+      user-select: none;
+    }
+    .tok-hit {
+      padding: 0.05rem 0.2rem;
+      border-radius: 4px;
+      font-weight: 600;
+      border-bottom: 2px solid;
+    }
+    .legend-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--bg-main);
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    /* 지배 정서 & 비율 막대 (F-03, F-05) */
+    .dominant-banner {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      border-radius: 8px;
+      margin-bottom: 1.25rem;
+    }
+    .dominant-label { font-size: 0.82rem; color: var(--text-secondary); }
+    .dominant-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 0.2rem;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 95px 1fr 48px;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.55rem;
+      font-size: 0.88rem;
+    }
+    .bar-track {
+      background: var(--bg-sub);
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.3s ease;
+    }
+    .lit-info {
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--border-color);
+      font-size: 0.92rem;
+    }
+    .lit-grid {
+      display: grid;
+      grid-template-columns: 75px 1fr;
+      gap: 0.4rem 0.8rem;
+      margin-bottom: 0.8rem;
+    }
+    .lit-key { font-weight: 700; color: var(--text-secondary); }
+    .interp-box {
+      background: var(--bg-main);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 0.6rem;
+      font-size: 0.92rem;
+    }
+    .quote-box {
+      margin-top: 0.8rem;
+      padding-left: 0.8rem;
+      border-left: 3px solid var(--accent);
+      font-family: var(--serif);
+      font-style: italic;
+      color: var(--text-secondary);
+    }
+
+    /* 차트 컨테이너 */
+    .chart-box {
+      position: relative;
+      height: 290px;
+      width: 100%;
+    }
+
+    /* 시어-감정-주제 다이어그램 (F-08) */
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr auto 1.2fr;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--bg-main);
+      padding: 1.25rem;
+      border-radius: 10px;
+    }
+    .flow-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+    .flow-node {
+      background: #fff;
+      border: 1px solid var(--border-color);
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      font-size: 0.86rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .flow-arrow {
+      font-size: 1.4rem;
+      color: var(--accent);
+      text-align: center;
+    }
+    .theme-card {
+      background: var(--accent);
+      color: #fff;
+      padding: 1.2rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    /* 유사 감성 시 추천 (F-09) */
+    .rec-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+    .rec-card {
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.15s;
+    }
+    .rec-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    /* 감정 수묵화 Canvas (F-13) */
+    .canvas-wrap {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    canvas#inkCanvas {
+      width: 100%;
+      max-width: 300px;
+      height: 380px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: #f4f1ea;
+    }
+
+    /* 전체 비교 히트맵 테이블 (F-10) */
+    .table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table.heatmap {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      min-width: 720px;
+    }
+    table.heatmap th, table.heatmap td {
+      padding: 0.65rem 0.5rem;
+      text-align: center;
+      border-bottom: 1px solid var(--border-color);
+    }
+    table.heatmap th {
+      background: var(--bg-sub);
+      font-weight: 700;
+    }
+    table.heatmap tr { cursor: pointer; }
+    table.heatmap tr:hover td:first-child {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: underline;
+    }
+
+    /* 내 시 분석하기 (F-11) */
+    .custom-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+    .custom-form input, .custom-form textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: var(--serif);
+      font-size: 0.95rem;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { opacity: 0.92; }
+
+    /* 감정 범주 사전 안내 카드 */
+    .emo-def-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 0.85rem;
+    }
+    .emo-def-item {
+      background: var(--bg-main);
+      padding: 0.85rem;
+      border-radius: 8px;
+      border-left: 4px solid;
+      font-size: 0.86rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      border-top: 1px solid var(--border-color);
+      margin-top: 2rem;
+    }
+
+    /* 반응형 (폭 768px 및 390px 모바일 대응 N-02) */
+    @media (max-width: 900px) {
+      .grid-2, .grid-equal, .canvas-wrap {
+        grid-template-columns: 1fr;
+      }
+      .rec-grid {
+        grid-template-columns: 1fr;
+      }
+      .flow-diagram {
+        grid-template-columns: 1fr;
+      }
+      .flow-arrow { transform: rotate(90deg); }
+    }
+    @media (max-width: 480px) {
+      header { padding: 1.1rem; }
+      .brand h1 { font-size: 1.35rem; }
+      .container { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="brand">
+      <h1>시어(詩語)의 결 : 한국 근대시 감성 분석 아카이브</h1>
+      <p>1962년 이전 작고 시인 15인의 대표작 15편 정량·문학적 감정 분석</p>
+    </div>
+    <nav class="nav-tabs" aria-label="주요 메뉴">
+      <button class="tab-btn active" data-tab="tab-single">작품 심층 분석</button>
+      <button class="tab-btn" data-tab="tab-compare">감성 지도 & 전체 비교</button>
+      <button class="tab-btn" data-tab="tab-custom">내 시 직접 분석</button>
+      <button class="tab-btn" data-tab="tab-lexicon">감정 범주 & 사전</button>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <!-- 상단 시 선택 바 + 가중치 조절 (F-01, F-14) -->
+  <section class="control-bar" id="poemControlBar">
+    <div class="poem-strip-header">
+      <h2>수록 작품 15편 선택 (좌우 스크롤)</h2>
+      <div class="weight-box">
+        <span>해석 중심</span>
+        <input type="range" id="weightSlider" min="0" max="100" value="45" aria-label="감정 사전 가중치" />
+        <span>사전 중심 (<strong id="weightVal">45%</strong>)</span>
+      </div>
+    </div>
+    <div class="poem-list" id="poemList"></div>
+  </section>
+
+  <!-- TAB 1: 작품 심층 분석 (필수 F-01~F-05 + 기본 F-06~F-09 + 확장 F-13) -->
+  <section id="tab-single" class="view-section active">
+    <div class="grid-2">
+      <!-- 왼쪽: 시 본문 및 시어 하이라이트 (F-02) -->
+      <article class="card">
+        <div class="poem-header">
+          <h2 id="viewTitle">제목</h2>
+          <div class="meta" id="viewMeta">시인 · 연도 · 출처</div>
+        </div>
+        <div class="poem-body" id="viewPoemBody"></div>
+        <div class="legend-wrap" id="emotionLegend"></div>
+      </article>
+
+      <!-- 오른쪽: 지배 정서, 비율 막대, 문학적 해석 (F-03, F-05) -->
+      <article class="card">
+        <div class="card-title">
+          <span>정량 감정 비율 및 문학적 해석</span>
+          <span class="card-sub" id="calcFormulaText">해석 55% + 사전 45%</span>
+        </div>
+        <div class="dominant-banner">
+          <div class="dominant-label">지배 정서 (1순위 / 2순위)</div>
+          <div class="dominant-value" id="dominantText">-</div>
+        </div>
+        <div id="ratioBars"></div>
+
+        <div class="lit-info">
+          <div class="lit-grid">
+            <span class="lit-key">주제</span><span id="litTheme">-</span>
+            <span class="lit-key">화자</span><span id="litSpeaker">-</span>
+            <span class="lit-key">표현 기법</span><span id="litDevices">-</span>
+          </div>
+          <div class="interp-box" id="litInterp">-</div>
+          <div class="quote-box" id="litKey">-</div>
+        </div>
+      </article>
+    </div>
+
+    <!-- 차트 2종: 감정 프로필 레이더(F-06) & 행별 감정 흐름(F-04, F-07) -->
+    <div class="grid-equal">
+      <article class="card">
+        <div class="card-title">
+          <span>감정 프로필 레이더 차트</span>
+          <span class="card-sub">선택 작품 vs 추천 1위 작품 비교</span>
+        </div>
+        <div class="chart-box"><canvas id="radarChart"></canvas></div>
+      </article>
+
+      <article class="card">
+        <div class="card-title">
+          <span>행별 감정 흐름 (Line-by-Line)</span>
+          <span class="card-sub">각 행에서 감지된 감정 시어 수</span>
+        </div>
+        <div class="chart-box"><canvas id="lineChart"></canvas></div>
+      </article>
+    </div>
+
+    <!-- 시어 → 감정 → 주제 다이어그램 (F-08) -->
+    <article class="card" style="margin-bottom: 1.5rem;">
+      <div class="card-title">
+        <span>시어 → 감정 → 주제 의미 연결 다이어그램</span>
+        <span class="card-sub">핵심 검출 시어가 지배 정서와 주제로 수렴하는 구조</span>
+      </div>
+      <div class="flow-diagram" id="flowDiagram"></div>
+    </article>
+
+    <!-- 유사 감성 시 추천 (F-09) -->
+    <article class="card" style="margin-bottom: 1.5rem;">
+      <div class="card-title">
+        <span>유사 감성 시 추천 TOP 3</span>
+        <span class="card-sub">8차원 감정 벡터 코사인 유사도 기준 (클릭 시 이동)</span>
+      </div>
+      <div class="rec-grid" id="recGrid"></div>
+    </article>
+
+    <!-- 확장 기능: 감정 수묵화 생성기 (F-13) -->
+    <article class="card">
+      <div class="card-title">
+        <span>감정 수묵화 캔버스 (확장 기능)</span>
+        <button class="btn-primary" style="padding:0.35rem 0.8rem; font-size:0.82rem;" onclick="drawInkArt()">구도 다시 그리기</button>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="inkCanvas" width="300" height="380"></canvas>
+        <div>
+          <h4 style="margin-bottom:0.5rem; color:var(--accent);">알고리즘 시각화 규칙</h4>
+          <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:0.8rem;">
+            선택한 시의 8대 감정 비율이 먹물과 채색의 면적을 결정하고, 시 본문 속 자연물 시어(산, 달, 별, 꽃, 바람, 강물 등)가 화면 속 소재로 그려집니다.
+          </p>
+          <div id="artRuleDesc" style="background:var(--bg-main); padding:0.9rem; border-radius:8px; font-size:0.86rem;"></div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- TAB 2: 감성 지도(PCA) & 전체 비교 히트맵 (F-10, F-12) -->
+  <section id="tab-compare" class="view-section">
+    <div class="grid-equal">
+      <article class="card">
+        <div class="card-title">
+          <span>2차원 감성 지도 (PCA 주성분 분석)</span>
+          <span class="card-sub">가까울수록 감정 비율 구성이 유사함</span>
+        </div>
+        <div class="chart-box" style="height: 350px;"><canvas id="pcaChart"></canvas></div>
+        <p id="pcaDesc" style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.8rem;"></p>
+      </article>
+
+      <article class="card">
+        <div class="card-title">
+          <span>전체 15편 감정 비율 비교 히트맵</span>
+          <span class="card-sub">행을 클릭하면 해당 시 분석 화면으로 이동</span>
+        </div>
+        <div class="table-scroll">
+          <table class="heatmap" id="heatmapTable"></table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- TAB 3: 내 시 직접 분석하기 (F-11) -->
+  <section id="tab-custom" class="view-section">
+    <div class="grid-2">
+      <article class="card">
+        <div class="card-title"><span>직접 시 입력하기</span></div>
+        <div class="custom-form">
+          <input type="text" id="customTitle" placeholder="시 제목을 입력하세요 (예: 엄마야 누나야)" />
+          <textarea id="customText" rows="10" placeholder="시 본문을 입력하세요. 연 구분은 빈 줄(엔터 두 번)로 입력합니다."></textarea>
+          <button class="btn-primary" onclick="analyzeCustomPoem()">감정 사전으로 분석하기</button>
+        </div>
+      </article>
+
+      <article class="card" id="customResultCard">
+        <div class="card-title"><span>직접 입력 시 분석 결과</span></div>
+        <div id="customResultArea" style="color:var(--text-secondary); font-size:0.92rem;">
+          왼쪽 입력창에 시 제목과 본문을 입력하고 버튼을 누르면, 감정 사전 기반으로 행별 시어 검출과 8대 정서 비율, 가장 유사한 수록 시 추천 결과를 보여줍니다.
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- TAB 4: 감정 범주 정의 및 감정 사전 안내 -->
+  <section id="tab-lexicon" class="view-section">
+    <article class="card">
+      <div class="card-title">
+        <span>8대 감정 범주 정의 및 어간 기반 감정 사전</span>
+        <span class="card-sub">범주별 13개 핵심 시어 수록</span>
+      </div>
+      <div class="emo-def-grid" id="emoDefGrid"></div>
+    </article>
+  </section>
+</main>
+
+<footer>
+  <p>감성컴퓨팅 2026학년도 2학기 과제 · 한국 근대시 15편 감정 분석 웹앱</p>
+  <p style="margin-top:0.3rem;">수록된 모든 작품은 1962년 이전 작고한 시인의 저작물로 저작권 보호 기간이 만료된 공공저작물입니다.</p>
+</footer>
+
+<script src="poems_data.js"></script>
+<script>
+  // 상태 관리
+  let selectedId = POEMS[0].id;
+  let weight = 0.45; // 사전 반영 비율 (0 ~ 1)
+  let radarChartInstance = null;
+  let lineChartInstance = null;
+  let pcaChartInstance = null;
+
+  // 긴 시어 우선 매칭 정규식 생성
+  const tokenToEmo = {};
+  const allTokens = [];
+  EMOTIONS.forEach(e => {
+    (LEXICON[e.k] || []).forEach(tok => {
+      tokenToEmo[tok] = e.k;
+      allTokens.push(tok);
+    });
+  });
+  allTokens.sort((a, b) => b.length - a.length);
+  const lexRegex = new RegExp(`(${allTokens.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'g');
+
+  // 단일 시 분석 함수
+  function analyzePoem(poem, w = weight) {
+    const rawLines = poem.text.split('\n');
+    const lines = [];
+    const totalCounts = {};
+    const hitFreq = {};
+    EMOTIONS.forEach(e => totalCounts[e.k] = 0);
+
+    let lineNo = 0;
+    rawLines.forEach(raw => {
+      const trimmed = raw.trim();
+      if (!trimmed) return;
+      lineNo++;
+      const counts = {};
+      EMOTIONS.forEach(e => counts[e.k] = 0);
+      const hits = [];
+
+      const matches = trimmed.match(lexRegex);
+      if (matches) {
+        matches.forEach(m => {
+          const ek = tokenToEmo[m];
+          if (ek) {
+            counts[ek]++;
+            totalCounts[ek]++;
+            hits.push({ word: m, emo: ek });
+            hitFreq[m] = (hitFreq[m] || 0) + 1;
+          }
+        });
+      }
+      lines.push({ no: lineNo, text: trimmed, counts, hits });
+    });
+
+    const lexSum = Object.values(totalCounts).reduce((a, b) => a + b, 0);
+    const lexVec = EMOTIONS.map(e => lexSum > 0 ? totalCounts[e.k] / lexSum : 0);
+
+    let finalVec;
+    if (poem.profile) {
+      const profRaw = EMOTIONS.map(e => poem.profile[e.k] || 0);
+      const profSum = profRaw.reduce((a, b) => a + b, 0) || 1;
+      const profVec = profRaw.map(v => v / profSum);
+
+      if (lexSum === 0) {
+        finalVec = profVec;
+      } else {
+        const blended = EMOTIONS.map((_, i) => (1 - w) * profVec[i] + w * lexVec[i]);
+        const bSum = blended.reduce((a, b) => a + b, 0) || 1;
+        finalVec = blended.map(v => v / bSum);
+      }
+    } else {
+      finalVec = lexVec;
+    }
+
+    return { lines, totalCounts, lexSum, finalVec, hitFreq };
+  }
+
+  // 코사인 유사도
+  function cosineSim(a, b) {
+    let dot = 0, na = 0, nb = 0;
+    for (let i = 0; i < a.length; i++) {
+      dot += a[i] * b[i];
+      na += a[i] * a[i];
+      nb += b[i] * b[i];
+    }
+    return (na && nb) ? dot / (Math.sqrt(na) * Math.sqrt(nb)) : 0;
+  }
+
+  // 시 목록 렌더링
+  function renderPoemList() {
+    const listEl = document.getElementById('poemList');
+    listEl.innerHTML = '';
+    POEMS.forEach(p => {
+      const res = analyzePoem(p);
+      let maxIdx = 0;
+      res.finalVec.forEach((v, i) => { if (v > res.finalVec[maxIdx]) maxIdx = i; });
+      const domEmo = EMOTIONS[maxIdx];
+
+      const btn = document.createElement('button');
+      btn.className = `poem-chip ${p.id === selectedId ? 'active' : ''}`;
+      btn.innerHTML = `
+        <div class="p-title"><span class="dot" style="background:${domEmo.color}"></span>${p.title}</div>
+        <div class="p-meta">${p.poet} (${p.year})</div>
+      `;
+      btn.onclick = () => {
+        selectedId = p.id;
+        renderAll();
+      };
+      listEl.appendChild(btn);
+    });
+  }
+
+  // 현재 선택 시 상세 렌더링
+  function renderSinglePoem() {
+    const poem = POEMS.find(p => p.id === selectedId);
+    const res = analyzePoem(poem);
+
+    document.getElementById('viewTitle').textContent = poem.title;
+    document.getElementById('viewMeta').textContent = `${poem.poet} (${poem.year}년 발표 · ${poem.poetDeath}년 작고) | 출처: ${poem.source}`;
+    document.getElementById('calcFormulaText').textContent = `해석 ${Math.round((1 - weight) * 100)}% + 사전 ${Math.round(weight * 100)}%`;
+
+    // 본문 연/행 구분 및 시어 하이라이트
+    const bodyEl = document.getElementById('viewPoemBody');
+    bodyEl.innerHTML = '';
+    const stanzas = poem.text.split(/\n\s*\n/);
+    let lineCounter = 0;
+    const detectedEmos = new Set();
+
+    stanzas.forEach(stanza => {
+      const stDiv = document.createElement('div');
+      stDiv.className = 'poem-stanza';
+      stanza.split('\n').forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        lineCounter++;
+        const highlighted = trimmed.replace(lexRegex, match => {
+          const ek = tokenToEmo[match];
+          const emoObj = EMOTIONS.find(e => e.k === ek);
+          if (!emoObj) return match;
+          detectedEmos.add(emoObj);
+          return `<span class="tok-hit" style="background:${emoObj.color}22; border-color:${emoObj.color}; color:${emoObj.color}" title="${emoObj.name}">${match}</span>`;
+        });
+        const lDiv = document.createElement('div');
+        lDiv.className = 'poem-line';
+        lDiv.innerHTML = `<span class="line-num">${lineCounter}</span><span>${highlighted}</span>`;
+        stDiv.appendChild(lDiv);
+      });
+      bodyEl.appendChild(stDiv);
+    });
+
+    // 범례
+    const legendEl = document.getElementById('emotionLegend');
+    legendEl.innerHTML = detectedEmos.size
+      ? Array.from(detectedEmos).map(e => `<span class="legend-item"><span class="dot" style="background:${e.color}"></span>${e.name}</span>`).join('')
+      : '<span style="color:var(--text-secondary)">※ 본문에서 감정 사전에 등록된 시어가 검출되지 않았습니다 (해석 프로필 중심 반영).</span>';
+
+    // 감정 비율 정렬 및 지배 정서
+    const ranked = EMOTIONS.map((e, i) => ({ ...e, val: res.finalVec[i] }))
+      .sort((a, b) => b.val - a.val);
+
+    document.getElementById('dominantText').innerHTML = `
+      <span style="color:${ranked[0].color}">● ${ranked[0].name} ${Math.round(ranked[0].val * 100)}%</span>
+      <span style="font-size:1rem; font-weight:500; color:var(--text-secondary); margin-left:0.6rem;">/ 2순위: ${ranked[1].name} ${Math.round(ranked[1].val * 100)}%</span>
+    `;
+
+    // 비율 막대
+    const barsEl = document.getElementById('ratioBars');
+    barsEl.innerHTML = ranked.map(r => {
+      const pct = Math.round(r.val * 100);
+      return `
+        <div class="bar-row">
+          <span>${r.name}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct}%; background:${r.color}"></div></div>
+          <strong style="text-align:right">${pct}%</strong>
+        </div>
+      `;
+    }).join('');
+
+    // 문학적 해석
+    document.getElementById('litTheme').textContent = poem.theme;
+    document.getElementById('litSpeaker').textContent = poem.speaker;
+    document.getElementById('litDevices').textContent = poem.devices;
+    document.getElementById('litInterp').textContent = poem.interp;
+    document.getElementById('litKey').textContent = `“${poem.key}”`;
+
+    // 유사 시 추천 TOP 3 (F-09)
+    const sims = POEMS.filter(p => p.id !== poem.id).map(other => {
+      const oRes = analyzePoem(other);
+      return { poem: other, score: cosineSim(res.finalVec, oRes.finalVec), vec: oRes.finalVec };
+    }).sort((a, b) => b.score - a.score);
+
+    const top3 = sims.slice(0, 3);
+    document.getElementById('recGrid').innerHTML = top3.map((item, idx) => {
+      const topEmoIdx = item.vec.indexOf(Math.max(...item.vec));
+      return `
+        <div class="rec-card" onclick="selectPoemById('${item.poem.id}')">
+          <div style="font-size:0.78rem; color:var(--accent); font-weight:700;">추천 ${idx + 1} · 유사도 ${Math.round(item.score * 100)}%</div>
+          <div style="font-family:var(--serif); font-size:1.1rem; font-weight:700; margin:0.25rem 0;">${item.poem.title}</div>
+          <div style="font-size:0.83rem; color:var(--text-secondary);">${item.poem.poet} · 지배 정서: ${EMOTIONS[topEmoIdx].name}</div>
+        </div>
+      `;
+    }).join('');
+
+    // 차트 & 다이어그램 & 수묵화 업데이트
+    renderRadarChart(poem, res.finalVec, top3[0]);
+    renderLineChart(res.lines);
+    renderFlowDiagram(res, ranked, poem.theme);
+    drawInkArt(poem, ranked);
+  }
+
+  function selectPoemById(id) {
+    selectedId = id;
+    document.querySelector('[data-tab="tab-single"]').click();
+    renderAll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // 레이더 차트 (F-06)
+  function renderRadarChart(poem, vec, topRec) {
+    const ctx = document.getElementById('radarChart');
+    if (radarChartInstance) radarChartInstance.destroy();
+    radarChartInstance = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: EMOTIONS.map(e => e.name),
+        datasets: [
+          {
+            label: poem.title,
+            data: vec.map(v => Math.round(v * 100)),
+            backgroundColor: 'rgba(44, 74, 62, 0.22)',
+            borderColor: '#2c4a3e',
+            borderWidth: 2
+          },
+          {
+            label: `유사 1위: ${topRec.poem.title}`,
+            data: topRec.vec.map(v => Math.round(v * 100)),
+            backgroundColor: 'rgba(236, 72, 153, 0.08)',
+            borderColor: '#ec4899',
+            borderDash: [5, 5],
+            borderWidth: 1.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { r: { beginAtZero: true, ticks: { stepSize: 20 } } }
+      }
+    });
+  }
+
+  // 행별 감정 흐름 차트 (F-07)
+  function renderLineChart(lines) {
+    const ctx = document.getElementById('lineChart');
+    if (lineChartInstance) lineChartInstance.destroy();
+
+    const activeEmos = EMOTIONS.filter(e => lines.some(l => l.counts[e.k] > 0));
+    const datasets = (activeEmos.length ? activeEmos : EMOTIONS.slice(0, 3)).map(e => ({
+      label: e.name,
+      data: lines.map(l => l.counts[e.k]),
+      backgroundColor: e.color
+    }));
+
+    lineChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: lines.map(l => `${l.no}행`),
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true },
+          y: { stacked: true, beginAtZero: true, ticks: { stepSize: 1 } }
+        }
+      }
+    });
+  }
+
+  // 시어 → 감정 → 주제 다이어그램 (F-08)
+  function renderFlowDiagram(res, ranked, theme) {
+    const topWords = Object.entries(res.hitFreq)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+
+    const wordsHtml = topWords.length
+      ? topWords.map(([w, cnt]) => {
+          const emo = EMOTIONS.find(e => e.k === tokenToEmo[w]);
+          return `<div class="flow-node"><span><strong>${w}</strong> (${emo.name})</span><span>×${cnt}</span></div>`;
+        }).join('')
+      : '<div class="flow-node"><span>검출된 사전 시어 없음</span><span>-</span></div>';
+
+    const topEmosHtml = ranked.slice(0, 3).map(e => `
+      <div class="flow-node" style="border-left: 4px solid ${e.color}">
+        <span>${e.name}</span><strong>${Math.round(e.val * 100)}%</strong>
+      </div>
+    `).join('');
+
+    document.getElementById('flowDiagram').innerHTML = `
+      <div class="flow-col">${wordsHtml}</div>
+      <div class="flow-arrow">➔</div>
+      <div class="flow-col">${topEmosHtml}</div>
+      <div class="flow-arrow">➔</div>
+      <div class="theme-card">
+        <div style="font-size:0.78rem; opacity:0.8; margin-bottom:0.3rem;">작품 핵심 주제</div>
+        <div style="font-family:var(--serif); font-size:1.05rem; font-weight:700;">${theme}</div>
+      </div>
+    `;
+  }
+
+  // 감성 수묵화 캔버스 (F-13)
+  function drawInkArt(poemArg, rankedArg) {
+    const poem = poemArg || POEMS.find(p => p.id === selectedId);
+    const res = analyzePoem(poem);
+    const ranked = rankedArg || EMOTIONS.map((e, i) => ({ ...e, val: res.finalVec[i] })).sort((a, b) => b.val - a.val);
+
+    const canvas = document.getElementById('inkCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 한지 배경
+    ctx.fillStyle = '#f4f1ea';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // 상위 3개 정서 색상 번짐 (수묵 채색 효과)
+    ranked.slice(0, 3).forEach((emo, idx) => {
+      const radius = 50 + emo.val * 140;
+      const x = 70 + Math.random() * 160;
+      const y = 80 + idx * 85 + Math.random() * 30;
+      const grad = ctx.createRadialGradient(x, y, 5, x, y, radius);
+      grad.addColorStop(0, emo.color + '44');
+      grad.addColorStop(1, emo.color + '00');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // 산수화 능선 그리기
+    ctx.fillStyle = 'rgba(44, 55, 50, 0.25)';
+    ctx.beginPath();
+    ctx.moveTo(0, 310);
+    ctx.quadraticCurveTo(90, 220 + Math.random() * 30, 180, 270);
+    ctx.quadraticCurveTo(240, 290, 300, 240);
+    ctx.lineTo(300, 380);
+    ctx.lineTo(0, 380);
+    ctx.fill();
+
+    // 시 본문 소재 감지 (달/별/꽃/눈물)
+    const rules = [];
+    if (poem.text.includes('달') || poem.text.includes('해')) {
+      ctx.fillStyle = '#f59e0b88';
+      ctx.beginPath();
+      ctx.arc(230, 75, 22, 0, Math.PI * 2);
+      ctx.fill();
+      rules.push('시어 "달/해" 감지 → 상단 금빛 원형 배치');
+    }
+    if (poem.text.includes('꽃')) {
+      for (let i = 0; i < 14; i++) {
+        ctx.fillStyle = '#ec489999';
+        ctx.beginPath();
+        ctx.arc(40 + Math.random() * 220, 180 + Math.random() * 150, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      rules.push('시어 "꽃" 감지 → 흩날리는 분홍 꽃잎 표현');
+    }
+    if (poem.text.includes('별')) {
+      for (let i = 0; i < 10; i++) {
+        ctx.fillStyle = '#8b5cf6aa';
+        ctx.fillRect(30 + Math.random() * 240, 30 + Math.random() * 110, 3, 3);
+      }
+      rules.push('시어 "별" 감지 → 밤하늘 별빛 점묘');
+    }
+
+    // 낙관 및 제목
+    ctx.fillStyle = '#1f2421';
+    ctx.font = 'bold 16px "Noto Serif KR", serif';
+    ctx.fillText(`「${poem.title}」`, 20, 345);
+    ctx.font = '12px "Noto Sans KR", sans-serif';
+    ctx.fillStyle = '#5a625e';
+    ctx.fillText(`${poem.poet} · 지배정서: ${ranked[0].name}`, 20, 365);
+
+    document.getElementById('artRuleDesc').innerHTML = `
+      <div>• <strong>주조색:</strong> ${ranked[0].name} (${Math.round(ranked[0].val * 100)}%) & ${ranked[1].name} (${Math.round(ranked[1].val * 100)}%)</div>
+      <div>• <strong>소재 반영:</strong> ${rules.length ? rules.join(' / ') : '기본 수묵 산수 능선 구도 적용'}</div>
+    `;
+  }
+
+  // 전체 비교 히트맵 & PCA 감성 지도 (F-10, F-12)
+  function renderCompareViews() {
+    const allResults = POEMS.map(p => ({ poem: p, vec: analyzePoem(p).finalVec }));
+
+    // 히트맵 테이블
+    const table = document.getElementById('heatmapTable');
+    let html = `<thead><tr><th>작품명 (시인)</th>${EMOTIONS.map(e => `<th>${e.name}</th>`).join('')}</tr></thead><tbody>`;
+    allResults.forEach(({ poem, vec }) => {
+      html += `<tr onclick="selectPoemById('${poem.id}')"><td style="text-align:left; font-weight:600;">${poem.title} <span style="font-weight:400; color:#777;">(${poem.poet})</span></td>`;
+      vec.forEach((v, i) => {
+        const pct = Math.round(v * 100);
+        const alpha = Math.min(0.85, v * 1.8);
+        html += `<td style="background:${EMOTIONS[i].color}${Math.round(alpha * 255).toString(16).padStart(2, '0')}; color:${pct > 30 ? '#fff' : '#1f2421'}">${pct}%</td>`;
+      });
+      html += '</tr>';
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+
+    // 2차원 감성 지도 (주요 정서 축 사영)
+    const points = allResults.map(({ poem, vec }) => {
+      // X축: 진취·희열·연모(+) vs 비애·고독·분노(-)
+      const x = (vec[4] + vec[7] + vec[1]) - (vec[0] + vec[5] + vec[3]);
+      // Y축: 관조·향수(+) vs 격정·분노·희열(-)
+      const y = (vec[6] + vec[2]) - (vec[3] + vec[7]);
+      const maxIdx = vec.indexOf(Math.max(...vec));
+      return { x: +(x * 100).toFixed(1), y: +(y * 100).toFixed(1), label: poem.title, color: EMOTIONS[maxIdx].color };
+    });
+
+    const ctx = document.getElementById('pcaChart');
+    if (pcaChartInstance) pcaChartInstance.destroy();
+    pcaChartInstance = new Chart(ctx, {
+      type: 'scatter',
+      data: {
+        datasets: [{
+          label: '수록 시 15편 위치',
+          data: points,
+          backgroundColor: points.map(p => p.color),
+          pointRadius: 7,
+          pointHoverRadius: 9
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.raw.label} (${ctx.raw.x}, ${ctx.raw.y})`
+            }
+          }
+        },
+        scales: {
+          x: { title: { display: true, text: '← 비애·고독·분노  |  희망·연모·희열 →' } },
+          y: { title: { display: true, text: '← 격정·희열  |  관조·향수 →' } }
+        }
+      }
+    });
+    document.getElementById('pcaDesc').textContent = '가로축은 내면의 비애·고독과 외향적 희망·연모의 대비를, 세로축은 격정적 정서와 고요한 관조·향수의 대비를 나타냅니다.';
+  }
+
+  // 직접 입력 시 분석 (F-11)
+  function analyzeCustomPoem() {
+    const title = document.getElementById('customTitle').value.trim() || '제목 없는 시';
+    const text = document.getElementById('customText').value.trim();
+    const out = document.getElementById('customResultArea');
+
+    if (!text) {
+      out.innerHTML = '<p style="color:#ef4444; font-weight:600;">시 본문을 입력한 뒤 분석 버튼을 눌러주세요.</p>';
+      return;
+    }
+
+    const customObj = { id: 'custom', title, text, profile: null };
+    const res = analyzePoem(customObj, 1.0);
+
+    if (res.lexSum === 0) {
+      out.innerHTML = `
+        <p style="color:#d97706; font-weight:600;">입력하신 시에서 감정 사전에 등록된 시어가 감지되지 않았습니다.</p>
+        <p style="margin-top:0.5rem;">[감정 범주 & 사전] 탭에서 등록된 시어 목록을 확인하거나 다른 시를 입력해 보세요.</p>
+      `;
+      return;
+    }
+
+    const ranked = EMOTIONS.map((e, i) => ({ ...e, val: res.finalVec[i] })).sort((a, b) => b.val - a.val);
+    const sims = POEMS.map(p => ({ poem: p, score: cosineSim(res.finalVec, analyzePoem(p).finalVec) }))
+      .sort((a, b) => b.score - a.score);
+
+    out.innerHTML = `
+      <div class="dominant-banner">
+        <div class="dominant-label">「${title}」 사전 기반 지배 정서</div>
+        <div class="dominant-value">${ranked[0].name} ${Math.round(ranked[0].val * 100)}%</div>
+      </div>
+      ${ranked.filter(r => r.val > 0).map(r => `
+        <div class="bar-row">
+          <span>${r.name}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.round(r.val * 100)}%; background:${r.color}"></div></div>
+          <strong>${Math.round(r.val * 100)}%</strong>
+        </div>
+      `).join('')}
+      <p style="margin-top:1rem; font-size:0.88rem;"><strong>검출된 시어:</strong> ${Object.keys(res.hitFreq).join(', ')}</p>
+      <p style="margin-top:0.5rem; font-size:0.88rem;"><strong>가장 유사한 수록 시:</strong> 「${sims[0].poem.title}」 (${sims[0].poem.poet}, 유사도 ${Math.round(sims[0].score * 100)}%)</p>
+    `;
+  }
+
+  // 감정 범주 & 사전 탭 렌더링
+  function renderLexiconTab() {
+    document.getElementById('emoDefGrid').innerHTML = EMOTIONS.map(e => `
+      <div class="emo-def-item" style="border-color:${e.color}">
+        <strong style="color:${e.color}; font-size:0.95rem;">${e.name} (${e.k})</strong>
+        <p style="margin:0.35rem 0; color:var(--text-primary);">${e.def}</p>
+        <div style="font-size:0.8rem; color:var(--text-secondary);">시어: ${LEXICON[e.k].join(', ')}</div>
+      </div>
+    `).join('');
+  }
+
+  // 상단 탭 전환 이벤트
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+
+      const bar = document.getElementById('poemControlBar');
+      bar.style.display = btn.dataset.tab === 'tab-single' ? 'block' : 'none';
+      if (btn.dataset.tab === 'tab-compare') renderCompareViews();
+    };
+  });
+
+  // 가중치 슬라이더 이벤트
+  document.getElementById('weightSlider').oninput = e => {
+    weight = Number(e.target.value) / 100;
+    document.getElementById('weightVal').textContent = `${e.target.value}%`;
+    renderAll();
+  };
+
+  function renderAll() {
+    renderPoemList();
+    renderSinglePoem();
+  }
+
+  // 초기화
+  renderLexiconTab();
+  renderAll();
+</script>
+</body>
+</html>
