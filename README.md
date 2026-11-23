@@ -6,8 +6,8 @@
 
 ## 1. 웹앱 주소 및 사용법
 
-* **웹앱 배포 주소 (GitHub Pages):** `https://<seoback-1117>.github.io/korean-poetry-emotion-map/`
-* **GitHub 저장소 주소:** `https://github.com/<seoback-1117>/korean-poetry-emotion-map`
+* **웹앱 배포 주소 (GitHub Pages):** `https://seoback-1117.github.io/korean-poetry-emotion-map/`
+* **GitHub 저장소 주소:** `https://github.com/seoback-1117/korean-poetry-emotion-map`
 
 ### 주요 사용법
 1. **작품 심층 분석 탭:** 상단 가로 작품 목록에서 15편 중 원하는 시를 선택하면 본문 내 감정 시어 하이라이트, 8대 정서 비율 막대, 지배 정서, 문학적 해석, 레이더 차트, 행별 감정 흐름 차트, 시어-감정-주제 다이어그램, 유사 감성 시 TOP 3, 감정 수묵화 캔버스를 한눈에 확인할 수 있습니다.
