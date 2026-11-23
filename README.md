@@ -6,8 +6,8 @@
 
 ## 1. 웹앱 주소 및 사용법
 
-* **웹앱 배포 주소 (GitHub Pages):** `https://<내아이디>.github.io/korean-poetry-emotion-map/`[cite: 24]
-* **GitHub 저장소 주소:** `https://github.com/<내아이디>/korean-poetry-emotion-map`
+* **웹앱 배포 주소 (GitHub Pages):** `https://seoback-1117.github.io/korean-poetry-emotion-map/`[cite: 24]
+* **GitHub 저장소 주소:** `https://github.com/seoback-1117/korean-poetry-emotion-map`
 
 ### 예시 앱 대비 주요 차별화 및 독창적 기능
 * **작품 및 시인 큐레이션 차별화:** 예시 앱의 10편과 겹치지 않도록 이상(「거울」), 이상화(「빼앗긴 들에도 봄은 오는가」, 「나의 침실로」), 노천명(「사슴」, 「이름 없는 여인이 되어」), 심훈(「그날이 오면」), 박용철(「떠나가는 배」), 변영로(「논개」), 이장희(「봄은 고양이로다」) 등 1962년 이전 작고 시인의 대표작 15편으로 새롭게 구성했습니다[cite: 2].
